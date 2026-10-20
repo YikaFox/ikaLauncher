@@ -1,0 +1,45 @@
+{
+    "[po]": {
+        "files.trimTrailingWhitespace": true,
+        "files.insertFinalNewline": false,
+        "files.trimFinalNewlines": true
+    },
+    "[java]": {
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        },
+        "editor.detectIndentation": false,
+    },
+    "[markdown]": {
+        "editor.formatOnSave": false
+    },
+    "[github-actions-workflow]": {
+        "editor.tabSize": 2
+    },
+    "editor.formatOnSave": true,
+    "better-comments.tags": [
+        {
+            "tag": "#.",
+            "color": "#3498DB",
+            "strikethrough": false,
+            "backgroundColor": "transparent"
+        }
+    ],
+    "editor.wordWrapColumn": 120,
+    "editor.rulers": [
+        120
+    ],
+    "java.import.gradle.wrapper.enabled": true,
+    "java.completion.filteredTypes": [
+        "java.awt.List",
+        "com.sun.*"
+    ],
+    "java.codeGeneration.generateComments": true,
+    "git.inputValidationLength": 100,
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.debug.settings.hotCodeReplace": "auto",
+    "java.settings.url": ".vscode/settings.prefs",
+    "java.format.settings.url": ".vscode/eclipse-formatter.xml",
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx2G -Xms100m -Xlog:disable"
+}

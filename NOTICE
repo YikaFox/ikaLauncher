@@ -1,0 +1,21 @@
+ikaLauncher - 基于 ATLauncher 制作的修改版本 / A modified build of ATLauncher
+
+ikaLauncher 是基于 ATLauncher (https://atlauncher.com) 修改而来的 Minecraft 启动器，
+遵循 GNU General Public License v3 发布。
+ikaLauncher is a modified version of ATLauncher (https://atlauncher.com),
+released under the GNU General Public License v3.
+
+感谢 ATLauncher 团队及所有贡献者长期以来的工作，没有他们就没有这个项目。
+Thanks to the ATLauncher team and all of its contributors for their work,
+without them this project would not exist.
+
+ATLauncher 原始项目 / Original project: https://github.com/ATLauncher/ATLauncher
+ATLauncher 官网 / Website: https://atlauncher.com
+ATLauncher 许可证 / License: GNU General Public License v3
+
+本修改版由 ikaLauncher 的作者维护，与 ATLauncher 官方无关，也不受其支持。
+This modified build is maintained by the ikaLauncher author and is not affiliated
+with, or supported by, the official ATLauncher project.
+
+第三方组件及其许可证请见“Third Party Libraries”标签页。
+See the "Third Party Libraries" tab for third party components and their licenses.

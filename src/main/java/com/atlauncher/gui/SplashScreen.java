@@ -1,0 +1,135 @@
+/*
+ * ATLauncher - https://github.com/ATLauncher/ATLauncher
+ * Copyright (C) 2013-2022 ATLauncher
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.atlauncher.gui;
+
+import java.awt.Graphics;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.awt.SystemTray;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+
+import javax.annotation.Nullable;
+import javax.imageio.ImageIO;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JWindow;
+
+import org.mini2Dx.gettext.GetText;
+
+import com.atlauncher.App;
+import com.atlauncher.FileSystem;
+import com.atlauncher.managers.LogManager;
+import com.atlauncher.network.Analytics;
+
+/**
+ * The splash screen which shows when the launcher is started up and is loading it's stuff.
+ */
+public class SplashScreen extends JWindow {
+    /**
+     * Optional custom splash image. Users can drop a "splash-screen.png" into the
+     * Data folder next to the launcher; when it's not there no splash is shown at
+     * all (the launcher just opens when it's ready).
+     */
+    private final @Nullable BufferedImage img = loadCustomImage();
+    private final ContextMenu CONTEXT_MENU = new ContextMenu();
+
+    private static @Nullable BufferedImage loadCustomImage() {
+        Path customSplash = FileSystem.BASE_DIR.resolve("splash-screen.png");
+
+        if (!Files.isRegularFile(customSplash)) {
+            return null;
+        }
+
+        try (InputStream in = Files.newInputStream(customSplash)) {
+            return ImageIO.read(in);
+        } catch (IOException e) {
+            LogManager.logStackTrace("Failed to load custom splash screen", e, false);
+            return null;
+        }
+    }
+
+    /**
+     * @return true if a custom splash image was found (and should be shown)
+     */
+    public boolean hasImage() {
+        return img != null;
+    }
+
+    public SplashScreen() {
+        this.setLayout(null);
+        if (img != null) {
+            this.setSize(img.getWidth(), img.getHeight());
+        }
+        this.setLocationRelativeTo(null);
+        this.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON3) {
+                    CONTEXT_MENU.show(SplashScreen.this, e.getX(), e.getY());
+                }
+            }
+        });
+        this.setAlwaysOnTop(false);
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        if (img != null) {
+            g.drawImage(img, 0, 0, this.getWidth(), this.getHeight(), null);
+        }
+    }
+
+    /**
+     * Closes and disposes of the splash screen.
+     */
+    public void close() {
+        this.setVisible(false);
+        this.dispose();
+    }
+
+    /**
+     * The context menu which is shows on right click for the splash screen image, giving a force quit option.
+     */
+    private static final class ContextMenu extends JPopupMenu {
+        public ContextMenu() {
+            super();
+
+            // no idea why, but this fixes some weird bottom and right margin
+            setLightWeightPopupEnabled(false);
+
+            JMenuItem forceQuit = new JMenuItem(GetText.tr("Force quit"));
+            forceQuit.addActionListener(e -> {
+                try {
+                    if (SystemTray.isSupported()) {
+                        SystemTray.getSystemTray().remove(App.trayIcon);
+                    }
+                } catch (Exception ignored) {
+                    // ignored
+                }
+
+                Analytics.endSession();
+                System.exit(0);
+            });
+            add(forceQuit);
+        }
+    }
+}
