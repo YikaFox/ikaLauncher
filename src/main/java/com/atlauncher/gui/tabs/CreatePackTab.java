@@ -240,8 +240,6 @@ public class CreatePackTab extends HierarchyPanel implements Tab {
         loaderTypeButtonGroup.add(loaderTypeForgeRadioButton);
         loaderTypeButtonGroup.add(loaderTypeLegacyFabricRadioButton);
         loaderTypeButtonGroup.add(loaderTypeNeoForgeRadioButton);
-        loaderTypeButtonGroup.add(loaderTypePaperRadioButton);
-        loaderTypeButtonGroup.add(loaderTypePurpurRadioButton);
         loaderTypeButtonGroup.add(loaderTypeQuiltRadioButton);
         JPanel loaderTypePanel = new JPanel(new FlowLayout());
 
@@ -250,8 +248,6 @@ public class CreatePackTab extends HierarchyPanel implements Tab {
         setupLoaderForgeButton(loaderTypePanel);
         setupLoaderLegacyFabricButton(loaderTypePanel);
         setupLoaderNeoForgeButton(loaderTypePanel);
-        setupLoaderPaperButton(loaderTypePanel);
-        setupLoaderPurpurButton(loaderTypePanel);
         setupLoaderQuiltButton(loaderTypePanel);
 
         mainPanel.add(loaderTypePanel, gbc);

@@ -19,6 +19,7 @@ package com.atlauncher.viewmodel.impl;
 
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Collections;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import java.util.HashMap;
@@ -28,6 +29,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
@@ -1020,6 +1023,23 @@ public class CreatePackViewModel implements SettingsListener, ICreatePackViewMod
                 url = "https://meta.quiltmc.org/v3/versions/loader/" + minecraftVersion;
                 type = "Quilt";
                 break;
+            case FORGE: {
+                String metadata = fetchText(
+                    "https://maven.minecraftforge.net/net/minecraftforge/forge/maven-metadata.xml");
+                return parseMavenVersions(metadata, minecraftVersion + "-", "Forge", false);
+            }
+            case NEOFORGE: {
+                // NeoForge for 1.20.1 is published as net/neoforged/forge with the old
+                // version scheme.
+                boolean legacy = "1.20.1".equals(minecraftVersion);
+                String metadata = fetchText("https://maven.neoforged.net/releases/net/neoforged/"
+                    + (legacy ? "forge" : "neoforge") + "/maven-metadata.xml");
+                String prefix = legacy
+                    ? minecraftVersion + "-"
+                    : (minecraftVersion.startsWith("1.") ? minecraftVersion.substring(2) + "." : minecraftVersion + ".");
+
+                return parseMavenVersions(metadata, prefix, "NeoForge", !legacy);
+            }
             default:
                 return emptyList();
         }
@@ -1065,12 +1085,52 @@ public class CreatePackViewModel implements SettingsListener, ICreatePackViewMod
         }
     }
 
+    private String fetchText(String url) {
+        try {
+            Request request = new Request.Builder().url(url).build();
+            try (okhttp3.Response response = Network.CLIENT.newCall(request).execute()) {
+                if (!response.isSuccessful() || response.body() == null) {
+                    LogManager.debug("Failed to fetch " + url + ": HTTP " + response.code());
+                    return null;
+                }
+                return response.body().string();
+            }
+        } catch (Exception e) {
+            LogManager.debug("Failed to fetch " + url + ": " + e.getMessage());
+            return null;
+        }
+    }
+
+    private List<LoaderVersion> parseMavenVersions(String xml, String prefix, String type, boolean versionIsRaw) {
+        List<LoaderVersion> versions = new ArrayList<>();
+        if (xml == null) {
+            return versions;
+        }
+
+        Matcher matcher = Pattern.compile("<version>([^<]+)</version>").matcher(xml);
+        while (matcher.find()) {
+            String full = matcher.group(1).trim();
+            if (!full.startsWith(prefix)) {
+                continue;
+            }
+
+            String version = full.substring(prefix.length());
+            versions.add(versionIsRaw
+                ? new LoaderVersion(full, full, false, type)
+                : new LoaderVersion(version, full, false, type));
+        }
+
+        Collections.reverse(versions);
+        return versions;
+    }
+
     private List<LoaderVersion> loadLoaderVersions(LoaderType selectedLoader,
             @Nonnull String selectedMinecraftVersion) {
         try {
             // fabric family has its own meta api
             if (selectedLoader == LoaderType.FABRIC || selectedLoader == LoaderType.LEGACY_FABRIC
-                || selectedLoader == LoaderType.QUILT) {
+                || selectedLoader == LoaderType.QUILT || selectedLoader == LoaderType.FORGE
+                || selectedLoader == LoaderType.NEOFORGE) {
                 List<LoaderVersion> directVersions = loadLoaderVersionsFromDirectSource(selectedLoader,
                         selectedMinecraftVersion);
                 if (!directVersions.isEmpty()) {

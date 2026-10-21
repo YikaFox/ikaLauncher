@@ -103,7 +103,7 @@ public class ForgeLoader implements Loader {
 
         this.installerPath = FileSystem.LOADERS
                 .resolve("forge-" + this.minecraft + "-" + this.version + "-installer.jar");
-        this.installerUrl = Constants.DOWNLOAD_SERVER + "/maven/net/minecraftforge/forge/" + this.minecraft + "-"
+        this.installerUrl = "https://maven.minecraftforge.net/net/minecraftforge/forge/" + this.minecraft + "-"
                 + this.version + "/forge-" + this.minecraft + "-" + this.version + "-installer.jar";
 
         if (metadata.containsKey("installerSize")) {
